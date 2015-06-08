@@ -1,0 +1,64 @@
+%---------------------------------------------------------------
+%Updated with effect from: 6 Nov. 1991
+%World Scientific Publishing Company
+%Instructions for Typesetting Camera-ready
+%Manuscript Using Computer Software
+%Latex version
+%\documentstyle [12pt]{article}
+\font\tenbf=cmbx10
+\font\tenrm=cmr10
+\font\tenit=cmti10
+\font\elevenbf=cmbx10 scaled\magstep 1
+\font\elevenrm=cmr10 scaled\magstep 1
+\font\elevenit=cmti10 scaled\magstep 1
+\font\ninebf=cmbx9
+\font\ninerm=cmr9
+\font\nineit=cmti9
+\font\eightbf=cmbx8
+\font\eightrm=cmr8
+\font\eightit=cmti8
+\font\sevenrm=cmr7
+
+%\textwidth 6.0in
+%\textheight 8.5in
+\topmargin=0cm
+\oddsidemargin=0cm  \evensidemargin=0cm
+\textheight= 23cm
+\textwidth=  16cm                            %  A4 size
+%\textwidth 15cm
+%\textheight 23cm
+\pagestyle{empty}
+%\topmargin -0.25truein
+%\oddsidemargin 0.30truein
+%\evensidemargin 0.30truein
+\raggedbottom
+% new macro for bibliography
+\newcommand{\bibit}{\nineit}
+\newcommand{\bibbf}{\ninebf}
+\renewenvironment{thebibliography}[1]
+ { \elevenrm
+   \begin{list}{\arabic{enumi}.}
+    {\usecounter{enumi} \setlength{\parsep}{0pt}
+     \setlength{\itemsep}{3pt} \settowidth{\labelwidth}{#1.}
+     \sloppy
+    }}{\end{list}}
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\parindent=3pc
+\baselineskip=10pt
+
+\newcommand{\gsim}{\hbox{ \raise3pt\hbox to 0pt{$>$}\raise-3pt\hbox{$\sim$} }}
+\newcommand{\lsim}{\hbox{ \raise3pt\hbox to 0pt{$<$}\raise-3pt\hbox{$\sim$} }}
+
+\def\picture #1 by #2 (#3){
+ \vbox to #2{\hrule width #1 height 0pt depth 0pt \vfill \special{picture #3}}}
+
+\def\scaledpicture #1 by #2 (#3 scaled #4){{
+  \dimen0=#1  \dimenl=#2
+  \divide\dimen0 by 1000 \multiply\dimen0 by #4
+  \divide\dimen1 by 1000 \multiply\dimen1 by #4
+  \picture \dimen0 by dimen1 (#3 scaled #4)}}
+\def\finder{\picture 260pt by 165pt
+(screen0 scaled 500)}
+
+
+

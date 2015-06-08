@@ -1,0 +1,53 @@
+
+
+#!/bin/bash
+
+helpmsg(){
+cat << eof
+  run_mnjspr [options]
+  -conf 
+  -numevt
+  -runfile
+  -eventfile
+  -bsfile
+  -z  : When -z option is specified, give event file name without .gz suffix.
+eof
+exit
+}
+
+TEMPFILE=tmp_mnjspr.$$
+NUMEVT=100
+RUNFILE="spring.run"
+EVENTFILE="spring.evt"
+COMPRESS=0
+cat > $TEMPFILE <<EOF
+# Spring input file created by run_mnjspr at $today
+EOF
+
+
+while [ $# -ne 0 ]
+do
+ case "$1" in
+  -conf) shift ; cat $1 >> $TEMPFILE ;;
+  -numevt) shift ; echo "MINIJET.SPRINGNUMEVENT: $1" >> $TEMPFILE  ;;
+  -runfile) shift ; echo "MINIJET.SPRINGRUNFILENAME: $1" >> $TEMPFILE ;;
+  -bsfile) shift ; echo "MINIJET.BASESDATAFILENAME: $1 " >> $TEMPFILE ;;
+  -eventfile) shift ; echo "MINIJET.SPRINGEVENTFILENAME: $1" >> $TEMPFILE ;
+              EVENTFILE=$1 ;;
+  -z) COMPRESS=1 ;;
+  *) echo "Error :: Invalid option " $1 ; helpmsg ; exit ;;
+ esac
+ shift
+done
+
+
+./mnj_spring.exe < $TEMPFILE
+
+if [ "$COMPRESS" == "1" ] ; then
+   rm -f $EVENTFILE.gz
+   gzip $EVENTFILE
+fi
+
+rm -f $TEMPFILE
+
+

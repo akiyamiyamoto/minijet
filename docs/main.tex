@@ -1,0 +1,1793 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%    MINIJET event generator paper.
+%
+%     by A.Miyamoto (KEK) and H. Hayashii (NWU)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentstyle [12pt]{article}
+\input setup.tex
+
+\begin{document}
+
+
+%%%%%%%%%%%%%%%%%%%
+%
+%  The title of the paper
+%
+%%%%%%%%%%%%%%%%%%%
+
+%\centerline{Draft:Not for distribution}
+%\centerline{version: \today}
+
+\begin{center}
+{\bf \vglue 10pt 
+   A MONTE CALRO PROGRAM TO GENERATE  \\                      
+               \vglue 3pt                                                       
+   MINI-JET EVENTS IN TWO-PHOTON PROCESS \\}
+\end{center}
+\vglue 5pt
+
+\begin{center}
+Akiya Miyamoto\footnote{e-mail address: miyamoto@kekux1.kek.jp} \\
+{\it KEK, National Laboratory for High Energy Physics\\
+1-1 Oho, Tsukuba, Ibaraki 305, Japan} \\
+and \\
+Hisaki Hayashii\footnote{e-mail address: thkh@jpnkektr.bitnet} \\
+{\it Department of Physics, Nara Woman's University, 
+Nara 630, Japan}
+\end{center}
+
+\vglue 0.3cm
+\begin{center}{\bf ABSTRACT} \end{center}
+An event generator for resolved photon processes in photon-photon
+collisions in $e^+e^-$ reactions
+is developed.  The program can generate direct, once-resolved
+and twice-resolved processes separately or simultaneously according
+to user switches.
+
+%\begin{center}
+%{\rightskip=3pc
+% \leftskip=3pc
+% \tenrm\baselineskip=12pt }
+%\end{center}
+
+\baselineskip=14pt
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  Chapter 1.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vglue 14pt
+\centerline{ {\bf PROGRAM SUMMARY}}
+\vglue 14pt
+
+{\tenrm
+\noindent {\tenit Title of program : MINIJET}
+\vglue 12pt
+
+\noindent {\tenit Program obtainable from}: CPC Program Library,
+Queen's University of Belfast, N. Ireland, and the authors
+upon the request by e-mail.}
+
+\vglue 12pt
+
+\noindent {\tenit Computer for which the program is designed and others on
+which it is operable}: FACOM and others with FORTRAN 77 compiler.
+\vglue 12pt
+
+\noindent {\tenit Computer}: FACOM-M1800; {\it Installation}: National
+Laboratory for High Energy Physics (KEK), Tsukuba, Ibaraki, Japan.
+\vglue 12pt
+
+\noindent {\tenit Operating system}: OSIV MSP-E20, OSIV EX.
+\vglue 12pt
+
+\noindent {\tenit Program language used}: FORTRAN77
+\vglue 12pt
+
+\noindent {\tenit High speed storage required}: 1300 k words.
+\vglue 12pt
+
+\noindent {\tenit No. of bits in a word}: 32
+\vglue 12pt
+
+\noindent {\tenit Peripherals used}: terminal or card reader for input, disk
+and printer for output.
+\vglue 12pt
+
+\noindent {\tenit No. of lines in combined program and test deck}: 2629
+\vglue 12pt
+
+\noindent {\tenit Keywords}: Monte Carlo simulation, event generation,
+mini-jet, two-photon process, resolved photon process.
+\vglue 12pt
+	
+\noindent {\tenit Nature of physical problem}: \\
+In high energy two-photon processes in $e^+e^-$ reactions,
+the hadronic components in the photon contribute significantly
+to the process. In particular, 
+jet production in (almost real) photon-photon collisions offers
+an opportunity to test pertuabative QCD.
+In addition, the understanding of the process
+is indispensable for designing future
+high energy $e^+e^-$ linear colliders
+%
+%best process to test our knowledge concerning the parton distribution
+%in the photon.
+%almost real photon resolved into quarks and gluons.
+%Collisions among them, resolved photon process, 
+%constitute the significant part of high $p_t$ jet productions.  
+%This process provides us a filed to test perturbative QCD
+%Since the collisions between the partons (
+%{\it i.e.} quarks and gluons ) inside the photon contribute to 
+%the significant part of high $p_t$ jet production,
+%the understanding is crucial 
+%for designing future
+%high energy $e^+e^-$ linear colliders.
+
+\vglue 12pt
+
+\noindent {\tenit Method of solution}: \\ 
+The cross sections of the resolved photon processes
+are calculated in the parton level 
+by a convolution of photon luminosity function,
+photon structure functions and sub-process cross sections.
+Based on the calculation, high $p_t$ partons
+and remnant partons 
+accompanied with the resolved photon processes are generated.
+They are hadronized subsequently, while neglecting scattered
+$e^\pm$.
+\vglue 12pt
+
+\noindent {\tenit Typical running time}: \\
+The running times depends upon physical parameters.
+In the case of a default parameter set, it
+takes 487 sec for calculating
+cross section on FACOM-M1800 computer,
+while 2.85 sec to generate 1k events.
+\vglue 12pt
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  Long Writeup
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\centerline{\bf LONG WRITE-UP}
+
+\section{Introduction}
+
+The program package presented here is to calculate the
+cross section of jet productions by a
+collision of almost real $\gamma\gamma$ 
+in $e^+e^-$ collisions 
+and generate such events for Monte Calro studies.
+There are three different classes of diagrams
+which contribute to the mini-jet production in 
+$\gamma\gamma$ collisions,
+as shown in Fig.~\ref{DIAGRAM}.
+We call each diagram as direct(Fig.~\ref{DIAGRAM}a),
+once-resolved(Fig.~\ref{DIAGRAM}b) and 
+twice-resolved(Fig.~\ref{DIAGRAM}c), respectively.
+Those three processes contribute to the jet production in
+$\gamma\gamma$ collision in the same order,
+%In a collision between almost real $\gamma\gamma$,
+%resolved photon process constitute the significant part
+%of the cross section of high $p_t$ jet productions,
+as pointed theoretically by M.~Drees and R.~M.~Godbole\cite{DREESA}.
+It was first confirmed experimentally by AMY\cite{AMY}
+at TRISTAN.  In the recent studies done by TOPAZ\cite{TOPAZ93B,HAYASHII}
+and ALEPH\cite{ALEPH93} for the two-photon 
+process in $e^+e^-$ collisions and those by
+H1\cite{H1} and ZEUS\cite{ZEUS} for 
+$ep$ collisions, the resolved photon processes are shown to 
+constitute the indispensable part of the jet production.
+However, comparison of the data and theoretical predictions
+are rather qualitative.  
+The more precise understanding of the resolved process
+is necessary, because it would allow us to test perturbative 
+QCD\cite{QCDTEST}
+and would provide us valuable information for designing future
+$e^+e^-$ and $\gamma\gamma$ 
+colliders\cite{MIYAMOTO92,LCBACKGROUND}.
+
+The program uses the program package BASES/SPRING\cite{BASES86,GRACE92}
+to calculate the cross section and subsequently generate 
+the four momenta of hard jets and remnant jets.
+Produced partons are then hadronized using the 
+LUND 6.3\cite{LUND63} program 
+package in the SPRING step.
+The origin of the $\gamma$ can be either bremsstrahlung
+or beamstrahlung, according to the parameters of the program.
+%We use programs in PYTHIA\cite{PYTHIA56}
+%for a  calculation of a parton density functions.
+
+As Monte Calro event generators
+for jet production by 
+photon-photon collisions in $e^+e^-$ reactions,
+PYTHIA\cite{PYTHIA56}
+and HERWIG\cite{HERWIG} are also available.
+They can include the $\gamma\gamma$ initial state to the existing
+general purpose generator.  
+The program presented here and the default parameter sets
+correspond to those used by TOPAZ group\cite{TOPAZ93B,HAYASHII}.
+The ALEPH\cite{ALEPH93} group reported that our program provides better 
+descriptions of jets production in two-photon 
+process than those of PYTHIA and HERWIG.
+
+
+In the following sections, we will discuss the 
+methods to calculate the cross section and
+to generate Monte Calro events.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% A Method of Monte Calro event simulation.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{A method for Monte Calro simulation}
+\label{SECMETHOD}
+We use the program package BASES/SPRING\cite{BASES86,GRACE92} to
+calculate the cross section and generate four-momentum of final
+particles. What we have to prepare when we use the package
+is a function to give a differential cross section.
+
+The general expression for the differential cross section 
+of jet production by photon-photon collisions in $e^+e^-$ reactions
+is given as follows
+according to M.~Drees and R.~M.~Godbole\cite{DREESB};
+\begin{eqnarray}
+ {d\sigma \over dx_1 dx_2 dx_3 dx_4 dcos\hat{\theta}} = 
+ f_{\gamma/e^-}(Q^2, x_1) 
+         f_{\gamma/e^+}(Q^2, x_2)  
+		       D_{p/\gamma}(Q^2,x_3)
+	        D_{p/\gamma}(Q^2,x_4) 
+	        {d\hat{\sigma}(\hat{s},\hat{t})\over dcos\hat{\theta}},
+\end{eqnarray}
+where $f_{\gamma/e^\pm}$ are the photon flux factors,
+$D_{p/\gamma}$ are the parton ( gluon
+or quark ) density functions inside $\gamma$, and
+$d\hat{\sigma}(\hat{s},\hat{t})\over dcos\hat{\theta}$ is a differential
+cross section of the sub-process. $\hat{\theta}$ is the
+scattering angle of the sub-process in its rest.
+$x_1$ and $x_2$ are photon energies scaled by beam
+energy($E_{beam}$) and $x_3$ and $x_4$ are parton energies scaled by
+the original photon energy. 
+$\hat{s}\equiv x_1 x_2 x_3 x_4 s$ is the squared invariant energy of the 
+sub-processes with $s=4 E^2_{beam}$.
+Both $D_{p/\gamma}$ are replaced by $\delta(1-x_i)$ $(i=3\ {\rm and} \ 4)$
+in the case of the direct process and
+either $D_{p/\gamma}(Q^2,x_3)$ or $D_{p/\gamma}(Q^2,x_4)$
+is replaced with $\delta(1-x_i)$ in the case of the once-resolved process.  
+
+In this program,  $f_{\gamma/e^\pm}$ is calculated by the subroutine
+{\tt MNJGAM}, $D_{p/\gamma}$ by {\tt MNJPRB}, and 
+$d\hat{\sigma}(\hat{s},\hat{t})\over dcos\hat{\theta}$ by {\tt MNJCRS}.
+Using these routines, a function {\tt FNCMNJ} gives
+${d\sigma \over dx_1 dx_2 dx_3 dx_4 dcos\hat{\theta}}$ for BASES 
+calculation.  Number of dimensions in the BASES integration
+is six, five of which are used for $x_1$, $x_2$, $x_3$, $x_4$,
+and $\cos\hat{\theta}$, while the sixth dimension is used
+to select relevant sub-processes.
+
+
+\subsection{Photon spectrum function}
+Two types of bremsstrahlung photon spectrum functions and one type
+of beamstrahlung photon spectrum functions are implemented
+in the program, which can be selected by variables {\tt NGMINS}
+and {\tt NGPLUS} stored in the common {\tt /MNJPRM/},
+separately for $e^-$ and $e^+$ beams.
+
+The default bremsstrahlung photon spectrum function is
+given by a equivalent photon approximation including 
+the non-leading term\cite{BKT71};
+\begin{eqnarray}
+f_{\gamma/e}(x) &=& {\alpha_{em} \over \pi x }
+  \left[ (1 + (1-x)^2) \left\{ \ln ( {E_{beam} \over m_e } ) - 
+  \frac{1}{2} \right\}
+  + \frac{x^2}{2} \left\{ \ln ( {2(1-x) \over x} ) + 1 \right\} 
+  \right. \nonumber \\
+&+& \left. \frac{(2-x)^2}{2}\ln ( {2(1-x) \over 2-x} ) \right] 
+\label{EQ_EPA}
+\end{eqnarray}
+\noindent where $E_{beam}$ is the electron(positron) beam energy,
+$m_e$ is the electron mass.  We take $\alpha_{em}=1/137.0359895$ throughout 
+the program.
+
+For the bremsstrahlung photon spectrum for high energy
+$e^\pm$, M.~Drees {\it et al.}\cite{DREESB} suggested the  
+formula depend on photon virtuallity with additional suppression
+factor, which is given by
+\begin{equation}
+f_{\gamma/e}(Q^2, x)=0.85{\alpha_{em}\over 2\pi}
+  {1+(1-x)^2 \over x }
+  \ln({Q^2\over m_e^2} ). \label{EQ_EPAMOD} 
+\end{equation}
+The value  of $Q$ is set equal to the transverse momentum
+$p_t$ of hard jet
+or the half of center-of-mass energy of sub-process ($\frac{1}{2}\sqrt{\hat{s}}$)
+depending on the flag {\tt NQSSRC} in the common {\tt /MNJPRM/}. 
+
+The beamstrahlung photon spectrum is a function of 
+the beam size at interaction point ($\sigma_x$, $\sigma_y$,
+and $\sigma_z$), the initial beam energy ($E_{beam}$) and
+the number of particle per bunch$(N$). 
+Using these parameters, the photon spectrum is given by\cite{BEAMSPECT},
+\begin{eqnarray}
+f_{\gamma/e}(x) &=&
+{\kappa^{1/3}\over \Gamma(1/3)} x^{-2/3} (1-x)^{-1/3} 
+   e^{-{\kappa x \over 1 - x}} \nonumber \\
+&\times& \left[
+{1-\frac{1}{6\sqrt{\kappa}} \over g}
+(1 - { 1 - e^{-g N_\gamma} \over g N_\gamma } )
+ + \frac{1}{6\sqrt{\kappa}}
+(1 - { 1 - e^{-N_\gamma} \over N_\gamma } ), \right] \label{EQ_FLATBEAM}
+\end{eqnarray}
+\noindent where, 
+\begin{eqnarray}
+x&=& E_\gamma/E_{beam} ,\\
+g&=& 1 - \left[ \frac{N_{CL}}{2N_\gamma} (1+x) 
+   + \frac{1}{2} (1-x) \right] (1-x)^{2/3}, \\
+\kappa&=& \left(\frac{3}{2} \bar{\Gamma} \right) ^{-1},
+\end{eqnarray}
+\noindent and
+\begin{eqnarray}
+\bar{\Upsilon}&=& { 5\gamma_e^2\gamma_0 N \over 
+  6 \alpha \sigma_z (\sigma_x + \sigma_y) }, \\
+N_{CL} &=& 1.06 \alpha\gamma_e N {2 \over {\sigma_x + \sigma_y}} ,\\
+N_\gamma &=& N_{CL} { 1 \over \sqrt{ 1 + \bar{\Upsilon}^{2/3} }}. 
+\end{eqnarray}
+$\gamma_0$ is a gamma factor of the beam particle 
+($\gamma_0=E_{beam}/m_e c^2$) and $\gamma_e$ is a classical electron radius.
+
+This function reproduces the exact spectrum obtained by the 
+ABEL simulation\cite{ABEL}, except the slight difference in low photon
+energy region\cite{MIYAMOTO92}.  As default parameters,
+we prepared the parameter sets for the proposed $e^+e^-$ linear
+collider, JLC-I\cite{JLCI}.
+
+
+\subsection{Parton density function inside the photon}
+
+Due to lack of experimental knowledge,
+exact form of parton density inside the photon
+is not known well.  It is a
+subject of extensive physical investigation.
+Several parametrization are available in the program.
+
+DO parameterization\cite{DO} is an asymptotic solution to
+photon's APE equation in leading order QCD.
+The analytical forms are given by,
+\begin{eqnarray}
+xD_{q/\gamma}(Q^2,x)&=&F\left[ e_q^2 
+{(1.81-1.67x + 2.16x^2)x^{0.70} \over 1 - 0.4\ln{(1-x)}}
++ 0.0038(1-x)^{1.82}x^{-1.18} \right]  \\
+xD_{g/\gamma}(Q^2,x)&=&0.194F(1-x)^{1.03}x^{-0.97}
+\end{eqnarray}
+\noindent where,
+\begin{eqnarray}
+F={\alpha_{em} \over 2\pi} \ln ( {Q^2 \over \Lambda^2} ).
+\end{eqnarray}
+%\noindent where $F=(\alpha/2\pi x)\ln(Q^2/\Lambda^2)$.
+DO parameterization needs to be supplemented by VDM term
+to reproduce data of photon structure function.
+The form chosen by Drees and Godbole\cite{DREESA} is,
+\begin{eqnarray}
+D^{VDM}_{q/\gamma}(Q^2,x)&=&
+\alpha_{em}\left[ 5/16{1-x \over \sqrt{x}} + 1/10 {(1-x)^5 \over x} \right] \\
+D^{VDM}_{g/\gamma}(Q^2,x)&=&\alpha {2(1-x)^3 \over x}
+\end{eqnarray}
+We call this as ``DO+VDM'' parameterization. 
+%At low $x$, VDM term diverges worser than the $x^{-1.6}$ behaviour
+%of the exact asymptotic prediction, M.~Drees {\it et al.} suggested
+%the ``modified DO+VMD'' parameterization, where $x$ dependance of
+%VDM term is fixed to $x^{-1.6}$ behaviour;
+%\begin{equation}
+%D_{\gamma/q}(Q^2,x)&=&
+%\alpha\left[ 5/16{1-x \over \sqrt{x}} + 1/10 {(1-x)^5 \over x} \right] \\
+
+DG parametrization\cite{DG} uses the APE
+equation to determine $Q^2$ evolution of the density
+function.
+TASSO's data of the photon structure
+function at $Q^2=5.9$ GeV$^2$ is used to provide the input
+distribution at $Q^2 = 1$ GeV$^2$.
+H.~Abramowicz, et al.\cite{LAC}
+made the new DG like analysis using the
+much larger data sample.  They obtained three solutions
+depending on the $Q_0^2$ values and the treatment of the
+gluon function.   Their results for gluon density function
+are quite different from DG parametrization, especially at low x region.
+
+More recently, M.~Gl\"{u}ck, {\it et al.} determined photonic parton
+distribution including higher order  by imposing a VDM valencelike
+structure at a low resolution scale\cite{GRV92}.  
+
+%\underline{What about GS and DO.}
+
+In this program package, we include 
+DO, DO+VMD and  DG parameterization.
+The program of DG parameterization was obtained from 
+PYTHIA 7.3 and slightly modified to adopt our program package.
+The parton density function is calculated by the subroutine
+{\tt MNJPRB} and the function can be selected by its argument,
+{\tt NTYP}, which is also accessible by the variable 
+{\tt NDISTR} stored in the common
+{\tt /MNJPRM/}.  
+Other structure functions such as 
+LAC are not supplied.
+They are provided by PDFLIB\cite{PDFLIB}
+and they are implemented easily with 
+a slight modification of the subroutine {\tt MNJPRB}.
+
+
+\subsection{Sub-process cross sections}
+\label{SECSUBPROCESS}
+The cross section formula for the
+sub-processes are categorized into 12 different processes:
+(1) $\gamma\gamma\rightarrow q_i \bar{q_i}$,
+(2) $\gamma q_i \rightarrow g q_i$,
+(3) $\gamma g \rightarrow q_i \bar{q_i}$,
+(4) $q_i + q_i \rightarrow q_i + q_i$,
+(5) $q_i + q_j \rightarrow q_i + q_j$,
+(6) $q_i + \bar{q_i} \rightarrow q_i + \bar{q_i}$,
+(7) $q_i + \bar{q_i} \rightarrow q_j + \bar{q_j}$,
+(8) $q_i + \bar{q_j} \rightarrow q_i + \bar{q_j}$,
+(9) $q_i + \bar{q_i} \rightarrow g + g$,
+(10) $q_i + g \rightarrow q_i + g$,
+(11) $g + g \rightarrow q_i + \bar{q_i}$
+and
+(12) $g + g \rightarrow g + g $,
+where suffixes indicate quark flavors.
+The sub-process (1) is the direct process,
+(2) and (3) are the once-resolved processes
+and the rest are the twice resolved processes.
+We use sixth BASES varaible, $X(6)$, as an index
+to the sub-processes. The function {\tt FNCMNJ}
+returns the just the differential cross section of given 
+process and the total cross section is obtained by BASES
+as a part of the integration.
+As an option, it is also possible to calculate the cross section of each
+sub-processes separetly by setting the parameters {\tt NGNTYP} and {\tt NGNPRC}
+in the common {\tt /MNJPRM/} properly.
+
+As initial state quarks, we consider only $u$, $d$ and $s$ quarks
+since no heavy quarks components are seen in the photon structure
+functions. As final states quarks, we include charm and bottom quarks
+in addition to light quarks. 
+The cross section formula
+used in the program are summarized in the Appendix A.
+As a default ({\tt NMASQ=1}),
+quark mass effects are included only for charm and bottom quarks,
+and massless quark formula are applied for light quarks.
+Thresholds for heavy quark productions are set by {\tt QHMASS(1:6)}
+in the common {\tt /MNJQMS/} and is also controlled by {\tt NUMFLV} in
+the common {\tt /MNJPRM/}.  When we calculate the sub-process cross 
+section, strong coupling constant $\alpha_S$ is calculated as,
+\begin{equation}
+\alpha_S(Q^2)={12 \pi \over (33 - 2 N_f) \log(Q^2/{\Lambda^{(4)}}^2) }
+\end{equation}
+\noindent where $N_f$ is a number of flavors above threshold.
+To allow continuous change of $\alpha_S$ at flavor thresholds,
+$\Lambda^{(4)}$ is adjusted when $N_f$ changes to 3 or 5, if 
+{\tt NLAM} is set to 1 (not a default).  
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Event Generation}
+Once the cross sections are evaluated by BASES, generation  of 
+hard scattered partons are straight forward 
+with a help of SPRING.  Four momentum of scattered  hard partons
+are calculated from the integral variables, $x$.  We do not generate
+scattered electrons nor positrons, 
+while we generate remnant particles in the case of once-resolved
+and twice resolved processes.  
+When photon resolved into 
+a quark, anti-quark, or gluon, we generate 
+an anti-quark, quark or gluon, respectively, along
+the direction of beam particle.
+Their energy is determined so that energy sum
+of the resolved parton and the remnant is equal to 
+that of the photon. 
+Finally, produced partons are hadronized by using
+JETSET 6.3\cite{LUND63} string fragmentation routines.
+To use this hadronization program, we needed a trick to treat remnant
+jets in the subprocess
+$g g \rightarrow g g$, in which case we generate $u$ quarks as remnant
+particles instead of gluons.
+No parton shower option in JETSET program is used.
+
+The properties of generated events were studied by
+TOPAZ\cite{TOPAZ93B}.  According to this study,
+particles flows along the jets and particles
+activities due to the remnant jets are reasonably 
+well described by this event generator.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Program description.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Program description}
+\subsection{Flow of the job}
+As mentioned in the previous section,
+we use the program packages BASES/SPRING\cite{BASES86,GRACE92},
+which requires two job steps, namely the integration step 
+and generation step.  
+
+The JCL example for a job is attached in Appendix~\ref{JCLEXAMPLE}.
+The integration step requires four input cards for BASES.
+All physical parameters for MINIJET calculations are
+prepared in the commons {\tt /MNJPRM/, /MNJQMS/, {\rm and } /MNJBEM/}
+which are initialized by the block data {\tt MNJBLK}.
+To modify these parameters, user can directly modify 
+{\tt MNJBLK} or implement initialization procedure 
+in the subroutine {\tt MNJUIN} which is called from 
+{\tt USERIN} of BASES. User may initialize 
+histogram in the {\tt MNJUIN}.
+
+At the end of BASES, histograms, scatter plots and the total cross
+section for given input parameters are printed and the information
+for grids and weights of integrations are written into logical 
+unit 23 for for the latter use by SPRING.
+
+There are two input cards for generation step, SPRING; number of
+events to be generated and CPU time limits.  
+It also reads the integration information
+from logical unit 23,
+which is used to generate events.
+The subroutine {\tt MNJMPL} and {\tt MNJHAD}
+called from the subroutine {\tt SPEVNT}
+are used to convert the integration variables, $x(1:6)$,
+into parton four momentum and hadronize, respectively.  
+The generated particle information are
+stored in the common {\tt /LUJETS/}
+with a standard JETSET 6.3 format.  User can access to the common
+by the subroutine {\tt MNJUSP} which is called at the end of
+every events.
+
+
+%\begin{picture}(100,200)(10,20)
+%\put(1,1){\oval(20,12)}
+%\end{picture}
+
+%%%%%%%%%%%%%%%%%
+%
+%%%%%%%%%%%%%%%%
+\subsection{Switches for event type selection}
+In this section, we describe the commons which are used to store
+physical parameters controlling jet events.
+Variables whose name starts by {\tt N} are {\tt INTEGER*4} type, the
+others {\tt REAL*8}. Values indicated by D in a parenthesis
+are default values which are initialized in the block data {\tt
+MNJBLK}.  User can use the subroutine {\tt MNJUIN} to 
+set their prefered values.
+(R) indicates READ ONLY variables and user should not alter them. 
+
+\newlength{\MNJPRM}
+\settowidth{\MNJPRM}{\tt   xCOMMON /MNJPRM/ NGNTYP, NGNPRC, NQSSRC, NUMFLV, XXLAM, XLAM,}
+\begin{verbatim}
+    COMMON /MNJPRM/ NGNTYP, NGNPRC, NQSSRC, NUMFLV, XXLAM, XLAM,
+   >                XXLAM2, XLAM2, YMAX3, YMAX4, PTMIN, PTMAX,
+   >                NDISTR, NMASQ, NLAM, NGMINS, NGPLUS, NONEJT
+\end{verbatim}
+\vspace{-56pt}
+\hspace*{3ex}\fbox{\rule[42pt]{\MNJPRM}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] switches and parameters to control generated event
+type.  
+\item[\bf \tt NGNTYP :] (D=0) select the process type.
+  \begin{list}{}{\itemsep=0pt \parsep=0pt \topsep=0pt}
+  \item[= 0 :] generate all type of processes.
+  \item[= 1 :] generate only once resolved process.
+  \item[= 2 :] generate only twice resolved process.
+  \item[= 3 :] generate a sub-process specified by {\tt NGNPRC}.
+  \end{list}
+
+\item[\bf \tt NGNPRC :] (D=1) select the generated 
+sub-process ID (1 to 12),  valid only when {\tt NGNTYP}=3.  
+See section~\ref{SECSUBPROCESS} for the meanings of sub-process ID.
+
+\item[\bf \tt NQSSRC :] (D=1) a method to calculate $Q^2$
+  \begin{list}{}{\itemsep=0pt \parsep=0pt \topsep=0pt}
+  \item[= 0 :] use center-of-mass energy of hard process ($\hat{s}$)
+as $Q^2$.
+  \item[= 1 :] use $p_t^2$ of hard process as $Q^2$.
+  \end{list}
+
+\item[\bf \tt NUMFLV :] (D=4) number of flavors to be generated.
+  \begin{list}{}{\itemsep=0pt \parsep=0pt \topsep=0pt}
+  \item[= 0 :] number of generated flavors depends on $Q^2$;
+$u$, $d$, $s$, $c$, and $b$ quarks when $Q^2 > 500$ GeV/c$^2$, $u$, $d$, $s$,
+and $c$ quarks when $50 < Q^2 < 500$ GeV/c$^2$, otherwise $u$, $d$,
+and $s$ quarks are generated.
+  \item[= 3 :] generate $u$, $d$, and $s$ quarks.
+  \item[= 4 :] generate $u$, $d$, $s$ and $c$ quarks.
+  \item[= 5 :] generate $u$, $d$, $s$, $c$, and $b$ quarks.
+  \end{list}
+
+\item[\bf \tt XXLAM :] (D=0.4 (GeV)) $\Lambda^{(4)}$ used to
+calculate  $\alpha_S$.
+
+\item[\bf \tt XLAM :] (D=0.4 (GeV)) $\Lambda^{(4)}$ used to
+calculate  photon structure function.
+
+\item[\bf \tt XXLAM2,XLAM2 :] (R) internal use only
+({\tt XXLAM2=XXLAM$^2$, XLAM2=XLAM$^2$}).
+
+\item[\bf \tt NLAM :] (D=0) treatment of $\Lambda^{(4)}$ in hard
+scattering ({\tt XXLAM}).
+  \begin{list}{}{\itemsep=0pt \parsep=0pt \topsep=0pt}
+  \item[= 0 :] use fixed value as given by {\tt XXLAM} independent 
+  of number of generated flavors ($N_f$).
+  \item[= 1 :] {\tt XXLAM} is used when $N_f$=4, but changed when $N_f$=3 
+or 5 so that $\alpha_s$ changes continuously at the threshold of 
+new flavors.
+  \end{list}
+
+\item[\bf \tt NDISTR :] (D=1) Type of photon structure function.
+  \begin{list}{}{\itemsep=0pt \parsep=0pt \topsep=0pt}
+  \item[= 0 :] use DG structure function\cite{DG}. Number of flavor
+is changed automatically as the case of {\tt NUMFLV=0}.
+  \item[= 1 :] same as {\tt NDISTR}=0 case  but {\tt NUMFLV} is fixed
+to 3.
+  \item[= 2 :] same as {\tt NDISTR}=0 case  but {\tt NUMFLV} is fixed to 4.
+  \item[= 3 :] same as {\tt NDISTR}=0 case  but {\tt NUMFLV} is fixed to 5.
+  \item[= 4 :] reserved for LAC\cite{LAC} parameterization.
+  \item[= 5 :] reserved for LAC\cite{LAC} parameterization.
+  \item[= 6 :] reserved for LAC\cite{LAC} parameterization.
+  \item[= 7 :] use DO\cite{DO} structure function.
+  \item[= 8 :] use a sum of VMD and DO structure function.
+  \item[= 9 :] use a sum of modified VMD and DO structure function.
+  \end{list}
+
+\item[\bf \tt NMASQ :] (D=1) select the method  of quark treatment in
+hard processes.
+  \begin{list}{}{\itemsep=0pt \parsep=0pt \topsep=0pt}
+  \item[= 0 :] all quark are assumed to be massless.
+  \item[= 1 :] take into account $c$ and $b$ quark mass effect.
+  \item[= 2 :] take into account the mass effect for all quarks, but
+the formula used is correct only for direct process.
+  \end{list}
+
+\item[\bf \tt NGMINS :] (D=0) photon spectrum function from $e^-$ beam.
+  \begin{list}{}{\itemsep=0pt \parsep=0pt \topsep=0pt}
+  \item[= 0 :] bremsstrahlung photon spectrum by EPA as given in 
+Eq.\ref{EQ_EPA}. 
+  \item[= 1 :] bremsstrahlung photon spectrum by modified EPA forumula
+as given in Eq.\ref{EQ_EPAMOD}.
+%  \item[= 10 :] beamstrahlung photon spectrum of linear collider with
+%a round beam optics(Eq.\ref{EQ_FLATBEAM}.
+  \item[= 21 - 26 :] beamstrahlung photon spectrum of linear collider with
+a flat beam optics, whose parameter is given by an array 
+{\tt (BEMAMP(i,{\tt NGMINS-20}),i=1,7)} in a common {\tt /MNJBEM/}.
+  \end{list}
+
+\item[\bf \tt NGPLUS :] (D=0) same as {\tt NGMINS}, but for $e^+$
+beam.
+
+\item[\bf \tt YMAX3 :] (D=0.7) maximum absolute value of rapidity 
+for one of two jets produced in hard processes.
+
+\item[\bf \tt YMAX4 :] (D=0.7) maximum absolute value of rapidity 
+for the other jet.  If {\tt YMAX4} is negative, no cut on rapidity is
+applied to this jet and the cross section is counted twice if {\tt
+NONEJT} = 2 and the absolute values of the rapidities of both hard
+jets are less than {\tt YMAX3}.
+
+\item[\bf \tt PTMIN :] (D=3.0 (GeV)) minimum $p_t$ of hard jet.
+
+\item[\bf \tt PTMAX :] (D=8.0 (GeV)) maximum $p_t$ of hard jet.
+
+\item[\bf \tt NONEJT :] (D=1) A way to count cross section, when
+calculate one-jet inclusive cross section, and valid when {\tt YMAX4} 
+is negative.
+  \begin{list}{}{\itemsep=0pt \parsep=0pt \topsep=0pt}
+  \item[= 1 :] always count one-jet as one jet. 
+  \item[= 2 :] count one-jet twice if the absolute values of
+the rapidity of both jets are less than {\tt YMAX3}.
+  \end{list}
+
+\end{list}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  common /MNJQMS/
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newlength{\MNJQMS}
+\settowidth{\MNJQMS}{\tt   COMMON /MNJQMS/ QMAS(6), QHMAS(6)}
+\begin{verbatim}
+    COMMON /MNJQMS/ QMAS(6), QHMAS(6)
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJQMS}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] quark masses ({\tt QMAS(I)}) and 
+thresholds ({\tt QHMAS(I)}) for corresponding flavor productions.
+These are {\tt REAL*8} variables.  This common is used in
+the subroutine {\tt MNJCRS} and {\tt MNJMPL}.
+\item[\tt QMAS(1) = :] (D=0.325 GeV) $d$ quark mass.
+\item[\tt QMAS(2) = :] (D=0.325 GeV) $u$ quark mass.
+\item[\tt QMAS(3) = :] (D=0.5 GeV) $s$ quark mass.
+\item[\tt QMAS(4) = :] (D=1.5 GeV) $c$ quark mass.
+\item[\tt QMAS(5) = :] (D=4.5 GeV) $b$ quark mass.
+%\item[\tt QMAS(6) = :] not used.
+\item[\tt QHMAS(1) = :] (D=0.325 GeV) threshold for $d$ quark generation.
+\item[\tt QHMAS(2) = :] (D=0.325 GeV) threshold for $u$ quark generation.
+\item[\tt QHMAS(3) = :] (D=0.5 GeV) threshold for $s$ quark generation.
+\item[\tt QHMAS(4) = :] (D=1.87 GeV) threshold for $c$ quark generation.
+\item[\tt QHMAS(5) = :] (D=5.3 GeV) threshold for $b$ quark generation.
+%\item[\tt QHMAS(6) = :] not used.
+\end{list}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  common /MNJBEM/
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newlength{\MNJBEM}
+\settowidth{\MNJBEM}{\tt   COMMON /MNJBEM/ BEAMPR(7,6)}
+\begin{verbatim}
+    COMMON /MNJBEM/ BEAMPR(7,6)
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJBEM}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] Beam parameters of linear colliders for
+beamstrahlung photon generation,
+which is used in the subroutine {\tt MNJGAM}. {\tt BEAMPR} is 
+a {\tt REAL*8} array.  The first index corresponds to the parameters as
+described below, while the second index corresponds to the different
+machine optics.  As a default, JLC-I\cite{JLCI} parameters are
+stored; {\tt BEAMPR(1:7,1)}=S-band at $\sqrt{s}=300$ GeV,
+{\tt BEAMPR(1:7,2)}=S-band at $\sqrt{s}=500$ GeV,
+{\tt BEAMPR(1:7,3)}=L-band at $\sqrt{s}=300$ GeV,
+{\tt BEAMPR(1:7,4)}=L-band at $\sqrt{s}=500$ GeV,
+{\tt BEAMPR(1:7,5)}=X-band at $\sqrt{s}=300$ GeV,
+{\tt BEAMPR(1:7,6)}=X-band at $\sqrt{s}=500$ GeV.
+\item[\tt BEAMPR(1,1:6) = :] beam energy, $E_0$ (GeV).
+\item[\tt BEAMPR(2,1:6) = :] beam spot size in x direction 
+at interaction point (IP), $\sigma_x$ (cm).
+\item[\tt BEAMPR(3,1:6) = :] beam spot size in y at IP, $\sigma_y$ (cm).
+\item[\tt BEAMPR(4,1:6) = :] beam spot size in y at IP, $\sigma_z$ (cm).
+\item[\tt BEAMPR(5,1:6) = :] Number of particles in a bunch.
+\item[\tt BEAMPR(6,1:6) = :] Luminosity without  pinch effect.
+\item[\tt BEAMPR(7,1:6) = :] Number of beamstrahlung photons.
+\end{list}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  common /MNJEVT/
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Event information}
+Since we use JETSET 6.3 to hadronize partons, four momentum of final
+state particles are stored in the common {\tt /LUJETS/},
+whose format are described in Ref.~\cite{LUND63}.
+User can use the subroutine {\tt MNJUSP} to access {\tt /LUJETS/}
+which are called at the end of the event generation in SPRING.
+Kinematical informations used by BASES/SPRING are stored in the
+common {\tt /MNJEVT/}, which is described below.
+Variables whose name starts by {\tt N} are {\tt INTEGER*4} type, the
+others {\tt REAL*8}. 
+All variables other than {\tt EBEAM} are READ ONLY.
+{\tt EBEAM} is electron/positron beam energy,
+whose default value is 29 GeV.
+
+\newlength{\MNJEVT}
+\settowidth{\MNJEVT}{\tt x COMMON /MNJEVT/ RS, EBEAM, XG(25), EGAM1, EGAM2, CS, PCM,}
+\begin{verbatim}
+    COMMON /MNJEVT/ RS, EBEAM, XG(25), EGAM1, EGAM2, CS, PCM,
+   >                EGAM10, EGAM20, FONE, NPRC, INDX
+\end{verbatim}
+\vspace{-42pt}
+\hspace*{3ex}\fbox{\rule[28pt]{\MNJEVT}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] contains the generated event information. 
+\item[\bf \tt RS :] (R (GeV)) center of mass energy.
+\item[\bf \tt EBEAM :] (D=29.0 GeV) beam energy, which should be set
+by user in the block data {\tt MNJBLK} or the subroutine {\tt MNJUIN}.
+\item[\bf \tt XG(1:6) :] (R) a copy of random variables used for the
+event generation ( see section~\ref{SECMETHOD} for description. ).
+\item[\bf \tt XG(21) :] (R) the scaled energy of photon emitted from
+$e^-$ beam ($x_1 \equiv E_{\gamma} / E_{beam}$).
+\item[\bf \tt XG(22) :] (R) the scaled energy of photon emitted from
+$e^+$ beam ($x_2 \equiv E_{\gamma} / E_{beam}$).
+\item[\bf \tt XG(23) :] (R) the scaled energy of partons resolved
+from photon emitted by  $e^-$ ($x_3 \equiv E_{parton} / E_{\gamma}$).
+\item[\bf \tt XG(24) :] (R) the scaled energy of partons resolved
+from photon emitted by $e^+$ ($x_4 \equiv E_{parton} / E_{\gamma}$).
+\item[\bf \tt  CS :] (R) $\cos\theta$ of hard jets in its
+center-of-mass system.
+\item[\bf \tt  PCM :] (R) momentum of hard jets.
+\item[\bf \tt EGAM10 :] (R (GeV) ) photon energy (GeV) emitted from
+$e^-$ 
+\item[\bf \tt EGAM20 :] (R (GeV)) photon energy (GeV) emitted
+from $e^+$ 
+\item[\bf \tt EGAM1 :] (R (GeV)) energy of a parton in the initial
+state of hard processes.
+\item[\bf \tt EGAM2 :] (R (GeV)) energy of the other parton in the initial
+state of hard processes.
+\item[\bf \tt FONE :] (R) weight factor of events, valid when
+calculating one jet inclusive cross section.
+\item[\bf \tt NPRC :] (R) process ID of generated event.
+\item[\bf \tt INDX :] (R) pointer to the array {\tt KCDATA}, which
+gives the process type and parton IDs involved in hard process.
+
+\end{list}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  List of subroutines.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Breif description of subroutines}
+Purpose and arguments of the subroutines are described.
+First parameter (I or O) in the parenthisis of the arguments discriptions
+are the flag to indicate 
+whether it is input or output arguments.  Second parameter
+is a varaible type. 
+\newlength{\MNJCRS}
+\settowidth{\MNJCRS}{\tt xSUBROUTINE MNJCRS( NPROC, SHAT, IAD1, IAD2, IAD3, IAD4,}
+\begin{verbatim} 
+    SUBROUTINE MNJCRS( NPROC, SHAT, IAD1, IAD2, IAD3, IAD4,
+   >           COSTH, PTMIN, NMASQ,    DSDCS , PCM, QSQ)
+\end{verbatim}
+\vspace*{-42pt}
+\hspace*{3ex}\fbox{\rule[28pt]{\MNJCRS}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] calculate a cross section of sub-processes.
+\item[\tt NPROC :] (I,{\tt I*4}) sub-process ID as described in the 
+subsection \ref{SECSUBPROCESS}. 
+Negative {\tt NPROC} means the process where the initial particles
+are interchanged.
+\item[\tt SHAT :] (I, {\tt R*8}) squared center-of-mass energy of the sub-process.
+\item[\tt  IAD1, IAD2, IAD3, IAD4 :] (I, {I*4}) particles IDs involved
+in the sub-processes; {\tt IAD1, IAD2} for initial particles,
+and {\tt IAD3, IAD4} for final particles. Particle assignments to the
+IDs are same as those used by PDG group\cite{PDG}.  
+\item[\tt COSTH :] (I, {\tt R*8}) production angle in center-of-mass
+system of the sub-process.
+\item[\tt PTMIN :] (I, {\tt R*8}) minimum $p_t$ requirement for final particles.
+\item[\tt  NMASQ :] (I, {\tt I*4}) treatment of quark mass effect.
+Same meanings as those stored in the common {\tt /MNJPRM/}.
+\item[\tt DSDCS :] (O, {\tt R*8}) differential cross section 
+($d\sigma/d\cos\hat{\theta}$) for the sub-process in the unit of pb.
+\item[\tt PCM :] (O, {\tt R*8}) momentum of a final state particle.
+\item[\tt QSQ :] (O, {\tt R*8}) energy scale, $Q^2$, after take into
+account the quark mass effect.
+\end{list}
+
+\newlength{\MNJTYP}
+\settowidth{\MNJTYP}{\tt    SUBROUTINE MNJTYP( NTYPE, X, EBEAM, FX )}
+{ \samepage
+\begin{verbatim}
+    SUBROUTINE MNJTYP( NTYPE, X, EBEAM, FX )
+\end{verbatim}
+\vspace*{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJTYP}{0cm}}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] get the weight of a photon.
+\item[\tt NTYPE :] (I, {\tt I*4}) type of photon spectrum.  
+See the description of the common {\tt /MNJPRM/}.
+\item[\tt X :] (I, {\tt R*8}) scaled photon energy, 
+$X = E_{\gamma}/E_{beam}$.
+\item[\tt EBEAM :] (I, {\tt R*8}) beam energy.
+\item[\tt FX :] (O, {\tt R*8}) weight of the photon.
+\end{list}
+
+
+%\begin{verbatim}
+% SUBROUTINE USERIN
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] called by BASES program and do initialization
+%for numerical integration.
+%\end{list}
+
+\newlength{\FNCMNJ}
+\settowidth{\FNCMNJ}{\tt REAL FUNCTION FNCMNJ*8(X)}
+\begin{verbatim}
+    REAL FUNCTION FNCMNJ*8(X)
+\end{verbatim}
+\vspace*{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\FNCMNJ}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] called by BASES program and calculate the
+cross section for the phase space given by {\tt X}.
+\end{list}
+
+
+%\begin{verbatim}
+% SUBROUTINE USROUT
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] called by BASES program at the end of 
+%the integration and printout the results.
+%\end{list}
+
+
+\newlength{\MNJHAD}
+\settowidth{\MNJHAD}{\tt SUBROUTINE MNJHAD(NPART, RBUF)}
+\begin{verbatim}
+    SUBROUTINE MNJHAD(NPART, RBUF)
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJHAD}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] stores particle information generated by SPRING
+into the common {\tt /LUJETS/} and hadronize them 
+by using JETSET6.3 routines.
+\item[\tt NPART :] (I, {\tt I*4}) number of particles.
+\item[\tt RBUF(20,NPART) :] (I, {\tt I*4})
+particle information generated by SPRING. The array elements not
+listed below are reserved for future use.
+  \begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+  \item[\tt  RBUF( 1,I) =:] particle serial number.
+  \item[\tt RBUF( 2,I) =:] particle ID according to the PDG convension\cite{PDG}.
+  \item[\tt RBUF( 3,I) =:] particle mass (GeV).
+  \item[\tt RBUF( 4,I) =:] charge.
+  \item[\tt RBUF( 5,I) =:] $P_x$ (GeV).
+  \item[\tt RBUF( 6,I) =:] $P_y$ (GeV).
+  \item[\tt RBUF( 7,I) =:] $P_z$ (GeV).
+  \item[\tt RBUF( 8,I) =:] Energy GeV).
+  \item[\tt RBUF(12,I) =:] number of daughter particles.
+  \item[\tt RBUF(13,I) =:] particle serial number of the first daughter.
+  \item[\tt RBUF(14,I) =:] particle serial number of the last daughter.
+  \item[\tt RBUF(20,I) =:] set to 0 when particle is at the end of the
+color string, otherwise set to 10000.
+  \end{list}
+\end{list}
+
+\newlength{\MNJMPL}
+\settowidth{\MNJMPL}{\tt SUBROUTINE MNJMPL(NFINAL, PARTON, GBUF, PVCT)}
+\begin{verbatim}
+    SUBROUTINE MNJMPL(NFINAL, PARTON, GBUF, PVCT)
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJMPL}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] using the four-momentum information generated by
+SRING, prepares the array, {\tt PARTON}, for the hadronization 
+by the subroutine {\tt MNJHAD}.
+\item[\tt NFINAL :] (O, {\tt I*4}) number of final particles.
+\item[\tt PARTON(20,4) :] (O, {\tt R*4}) final particle information.
+Contents are same as those stored in the argument array {\tt RBUF} of the 
+subroutine {\tt MNJHAD}.
+\item[\tt GBUF(20) :] (O, {\tt R*4}) general event information,
+prepared for documentation purpose.
+  \begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+  \item[\tt GBUF( 1) =:] energy of resolved parton from $e^-$ side 
+(={\tt EGAM1}).
+  \item[\tt GBUF( 2) =:] energy of resolved parton from $e^+$ side 
+(={\tt EGAM2}).
+  \item[\tt GBUF( 3) =:] energy of photon from $e^-$ (={\tt EGAM10}).
+  \item[\tt GBUF( 4) =:] energy of photon from $e^+$ (={\tt EGAM20}).
+  \item[\tt GBUF( 5) =:] center-of-mass energy of hard process
+($\hat{s}$).
+  \item[\tt GBUF( 6) =:] $p_t$ of final particles of sub-process.
+  \item[\tt GBUF( 7) =:] $\cos\hat{\theta}$ of the sub-process.
+  \item[\tt GBUF( 8) =:] $\hat{\theta}$ of the sub-process.
+  \item[\tt GBUF( 9) =:] center-of-mass energy of the $\gamma\gamma$ system.
+  \item[\tt GBUF(10) =:] rapidity of first parton in laboratory system.
+  \item[\tt GBUF(11) =:] rapidity of the other parton in the
+laboratory system.
+  \item[\tt GBUF(12) =:] momentum of final particle produced in hard process.
+  \item[\tt GBUF(20) =:] weight factor of a event.
+  \end{list}  
+\item[\tt PVCT(4,3) :] (O, {\tt R*4})four-momentum array, {\tt PVCT(1,I)}=$p_x$,
+ {\tt PVCT(2,I)}=$p_y$, {\tt PVCT(3,I)}=$p_z$,
+and  {\tt PVCT(4,I)}=energy.
+  \begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+  \item[ \tt PVCT(J,1) =:] four-momentum of center-of-mass system of
+sub-process in laboratory system.
+  \item[ \tt PVCT(J,2) =:] four-momentum of first final state particle in
+the center-of-mass system of the sub-process.
+  \item[ \tt PVCT(J,3) =:] four-momentum of the other final state particle in
+the center-of-mass system of the sub-process.
+  \end{list}
+\end{list}
+
+{\samepage
+\newlength{\MNJPRB}
+\settowidth{\MNJPRB}{\tt SUBROUTINE MNJPRB(NTYP, NFLV, QSQ, X, XLAM2, PROB)}
+\begin{verbatim}
+    SUBROUTINE MNJPRB(NTYP, NFLV, QSQ, X, XLAM2, PROB)
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJPRB}{0cm}}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] calculate the parton density inside the photon.
+\item[ \tt NTYP :] (I, {\tt I*4}) 
+select the type of photon structure function.
+See the description of the common {\tt /MNJPRM/} for the meanings.
+\item[ \tt NFLV :] (I, {\tt I*4}) particle ID resolved from photon,
+1=$d$ quark, 2=$u$, 3=$s$, c=$c$, 5=$b$, and 21=gluon.  
+\item[ \tt QSQ :] (I, {\tt R*8}) energy scale.
+\item[ \tt X :] (I, ({\tt R*8}) scaled energy.
+\item[ \tt XLAM2 :] (I, {\tt R*8}) $\Lambda^2$.
+\item[ \tt PROB :] (O, {\tt R*8}) the value of the parton density in
+the photon.
+\end{list}
+
+
+%\begin{verbatim}
+% SUBROUTINE SPINIT
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] initialization routine for SPRING step. 
+%The seed for random variable and optional parameters for JETSET 6.3
+%should be initialized here.
+%\end{list}
+
+%\begin{verbatim}
+% SUBROUTINE SPEVNT
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] called by SPRING and generate one event.
+%\end{list}
+
+
+\newlength{\MNJSPE}
+\settowidth{\MNJSPE}{\tt     SUBROUTINE MNJSPE}
+\begin{verbatim}
+    SUBROUTINE MNJSPE
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJSPE}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] called at the end of SPRING step and print out
+seed of a random variable.
+\end{list}
+
+%\begin{verbatim}
+% SUBROUTINE MNJTIT
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] print parameters.
+%seed.
+%\end{list}
+
+
+\newlength{\MNJUIN}
+\settowidth{\MNJUIN}{\tt     SUBROUTINE MNJUIN}
+\begin{verbatim}
+    SUBROUTINE MNJUIN
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJUIN}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] 
+called from {\tt USERIN} and initialize
+parameters and histograms required for each calculations.
+\end{list}
+
+
+\newlength{\MNJUFL}
+\settowidth{\MNJUFL}{\tt         SUBROUTINE MNJUFL}
+\begin{verbatim}
+    SUBROUTINE MNJUFL
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJUFL}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] 
+called from {\tt FNCMNJ} to accumulate the histogram data.
+\end{list}
+
+
+
+%\begin{verbatim}
+% SUBROUTINE DRNSET(ISEED)
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] Initialize a seed for random number generation.
+%Prepared here to override the same routine in BASES/SPRING so as to 
+%allow the re-generation of the event which has been suspended
+%previously in the middle of the generation.
+%\item[\tt ISEED :] (I,{\tt I*4}) seed for random number generation.
+%\end{list}
+
+
+%\begin{verbatim}
+% REAL FUNCTION DRN*8(ISEED)
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] generate uniform random number between 0 to 1
+%using the function {\tt RLU} prepared in JETSET6.3\cite{LUND63}.
+%\item[\tt ISEED :] not used.
+%\end{list}
+
+
+%\begin{verbatim}
+% SUBROUTINE DRNGET(ISEED)
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] get a seed of random number.
+%\item[\tt ISEED :] (O,{\tt I*4})seed of the random number.
+%\end{list}
+
+%\begin{verbatim}
+% SUBROUTINE LRNSET(ISEED)
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] set the seed of random number in to 
+%the common {\tt /LUSEED/} for the use by JETSET6.3 program.
+%\item[\tt ISEED :] (I,{\tt I*4})seed of the random number.
+%\end{list}
+
+
+%\begin{verbatim}
+% SUBROUTINE LRNGET(ISEED)
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] get the seed of random number from 
+%the common {\tt /LUSEED/}.
+%\item[\tt ISEED :] (O,{\tt I*4})seed of the random number.
+%\end{list}
+
+\newlength{\MNJBLK}
+\settowidth{\MNJBLK}{\tt     BLOCK DATA MNJBLK}
+\begin{verbatim}
+    BLOCK DATA MNJBLK
+\end{verbatim}
+\vspace{-28pt}
+\hspace*{4ex}\fbox{\rule[14pt]{\MNJBLK}{0cm}}
+\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+\item[\bf Purpose :] block data, where the commons
+{\tt /MNJPRM/, /MNJBEM/, /MNJQMS/} are initialized.
+\end{list}
+
+%\begin{verbatim}
+% SUBROUTINE UBSTBK( PB, PR, PA)
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] utility routine to make a Lorentz transformation 
+%to four-momentum {\tt PB(4)} in {\tt PR(4)}-rest frame to
+%{\tt PA(4)} in {\tt PR(4)} moving system. 
+%\end{list}
+
+
+%\begin{verbatim}
+% SUBROUTINE UBSTFD( PB, PR, PA)
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] utility routine to make a Lorentz transformation 
+%to four-momentum {\tt PB(4)} to {\tt PA(4)}
+%in {\tt PR(4)} rest frame.
+%\end{list}
+
+%\begin{verbatim}
+% SUBROUTINE UVZERO( NWORDS, ARRAY )
+%\end{verbatim}
+%\begin{list}{ }{\parsep=0pt \itemsep=0pt \topsep=0pt }
+%\item[\bf Purpose :] utility routine to clear 
+%{\tt NWORDS } words of {\tt REAL*4} array {\tt ARRAY}.
+%\end{list}
+%%\end{document}
+
+\section{Conclusion}
+We have developed the event generation code for jets production
+in two-photon processes in $e^+e^-$ reactions.
+The program can generate direct, once-resolved and twice-resolved
+processes separately or simultaneously.
+The program was tested by TOPAZ and ALEPH 
+experiments and
+successful to reproduce event properties of
+inclusive jet production and hadronic event topologies
+
+
+\vskip 1cm
+\leftline{\bf Acknowledgment}
+We are grateful to S.~Kawabata and Minami-Tateya group at KEK for
+help in using BASES/SPRING system.
+This work was made in the course of the experimental study of $e^+e^-$
+data taken by the TOPAZ group and design studies of a future $e^+e^-$
+linear collider, JLC.  
+We thank members of the projects for useful discussions and encouragements.
+
+
+
+\vskip 1cm
+\begin{center}
+\bf REFERENCES
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  Bibliography
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{99}
+
+
+% 
+% "Probing the hadronic structure of the photon at TRISTAN"
+\bibitem{DREESA}
+M.~Drees and R.~M.~Godbole, Nucl.~Phys.~B339(1990)355.
+
+%
+%
+\bibitem{AMY}
+R.~Tanaka {\elevenit  et al.}, (AMY Collab.),
+{\elevenit Phys. Lett.} {\elevenbf B277} (1992) 215.
+
+%
+% ``Measurement of the Inclusive Cross Section of Jets in \gamma\gamma
+% Interactions at TRISTAN.''
+\bibitem{TOPAZ93B}
+H.~Hayashii {\elevenit et al.}, (TOPAZ Collab.), 
+{\elevenit Phys. Lett.} {\elevenbf B314} (1993) 149.
+
+%
+\bibitem{HAYASHII}
+H.~Hayashii, NWU-HEP 92-03, June 1992. To appear in the proceeding
+of the 9-th International Workshop on Photon-Photon collisions,
+San Diego, USA, March, 1992;
+H.~Hayashii, talk presented at Monion Conference.
+%
+	
+%
+% ``An Experimental Study of \gamma\gamma\rightarrow hadrons at LEP''
+%
+\bibitem{ALEPH93}
+D.~Buskulic {\elevenit et al.}, (ALEPH Collab.),
+{\elevenit CERN-PPE/93-94}, {\elevenit to be appear in Phys. Lett. B}.
+
+%
+%
+\bibitem{H1}
+T.~Ahmed {\elevenit et al.}, (H1 Collab.),
+{\elevenit Phys. Lett.} {\elevenbf B297} (1992) 205.
+
+%
+\bibitem{ZEUS}
+M.~Derrick {\elevenit et al.}, (ZEUS Collab.),
+{\elevenit Phys. Lett.} {\elevenbf B297} (1992) 404.
+
+\bibitem{BASES86}
+S.~Kawabata, {\elevenit Comp. Phys. Comm.}
+{\elevenbf 41} (1986) 127.
+
+\bibitem{GRACE92}
+T.~Ishikawa {\elevenit  et al.}, {\elevenit KEK Report 92-19},
+February 1993.
+
+\bibitem{QCDTEST}
+for example,
+R.~Enomoto {\elevenit et al.}, (TOPAZ Collab.,)
+{\elevenit KEK Preprint 93-107}, August, 1993;
+M.~Drees, M.~Kramer, J.~Zunft, and P.~M.~Zerwas,
+{\elevenit Phys. Lett. } {\elevenbf B306} (1993) 371.
+
+%
+% ``Minijet background at JLC''
+\bibitem{MIYAMOTO92}
+A.~Miyamoto, in the {\elevenit Proceedings of the Third Workshop
+on Japan Linear Collider}, ed. A.~Miyamoto, 
+{\elevenit KEK Proceedings 92-13}, December, 1992, p.389.
+
+%
+% ``Minijet background at JLC''
+%\bibitem{MIYAMOTOFFIR}
+
+\bibitem{LCBACKGROUND}
+M.~Drees and R.~M.~Godbole,
+{\elevenit DESY 92-044}, March, 1992;
+P.~Chen, T.~L.~Barklow  and M.~E.~Peskin, 
+{\elevenit SLAC-PUB-5873}, April, 1993;
+A.~Miyamoto, in the {\elevenit Proceedings of JLC-FFIR92}, 
+ed. T.~Tauchi and N.~Yamamoto, 
+{\elevenit KEK Proceedings 93-6}, June 1993, p. 541.
+
+%
+\bibitem{LUND63}
+T.~Sj\"{o}strand and M.~Bengtsson, Comp. Phys. Comm. 43(1987)367.
+%We used LUND6.3 default hadronization parameters.
+%
+
+%
+% ``PYTHIA5.6 and JETSET 7.3 ; Physics and Manual''
+\bibitem{PYTHIA56}
+H.~-U.~Bengtsson and T.~Sj\"{o}strand,
+{\elevenit Comp. Phys. Comm.} {\elevenbf 46} (1987) 43;
+T.~Sj\"{o}strand, {\elevenit CERN-TH.6488/92}, May, 1992. 
+
+%
+% ``HERWIG Monte Calro''
+\bibitem{HERWIG}
+G.~Marchesini, B.~R.~Webber, {\elevenit Nucl. Phys.}
+{\elevenbf B310} (1988) 461.
+
+%
+\bibitem{DREESB}
+M.~Drees and R.~M.~Godbole, 
+{\elevenit Phys. Rev. Lett.} {\elevenbf  67} (1991) 1189.
+%
+
+%
+% EPA formula with including non-leading term
+\bibitem{BKT71}
+S.~Brodsky, T.~Kinoshita and H.~Terasawa,
+{\elevenit Phys. Rev.} {\elevenbf D41} (1971) 1532.
+
+
+\bibitem{BEAMSPECT}
+K.~Yokoya, private communication. see also
+P.~Chen, SLAC-PUB-5615.
+%
+
+\bibitem{ABEL}
+K.~Yokoya, ABEL, KEK-Report-85-9, October. 1985, 
+also Nucl. Instr. Meth. B251 (1986) 1.
+%
+
+%
+\bibitem{JLCI}
+JLC Group, {\elevenit KEK Report 92-16}, December, 1992.
+
+
+%
+%   DO parametrization.
+\bibitem{DO}
+D.~W.~Duke and J.~F.~Owens, Phys.~Rev.~D26(1982)1600.
+%
+%   DG
+\bibitem{DG}
+M.~Drees and K.~Grassie, Z.~Phys.~C28(1985)451.
+%
+%  LAC
+% "Minijets and large hadronic backgrounds at e+e- supercolliders"
+\bibitem{LAC}
+H.~Abramowicz, K.~Charchula and A.~Levy, 
+Phys. Lett. B269(1991)458.
+%
+%
+
+
+%
+\bibitem{GRV92}
+M.~Gl\"{u}ck, E.~Reya, and A.~Vogt,
+{\elevenit Phys. Rev.} {\elevenbf D46} (1992) 1973.
+
+\bibitem{PDFLIB}
+H.~Plothow-Besch, 
+{\elevenit Comp. Phys. Comm.} {\elevenbf 75} (1993) 396.
+
+%
+\bibitem{PDG}
+Particle Data Group, 
+{\elevenit Phys. Rev.} {\elevenbf D45} (1992) S1.
+
+%
+%\bibitem{HARDCROS}
+%J.~F.~Owens and E.~Reya, 
+%{\elevenit Phys. Rev.} {\elevenbf 18} (1978) 1501;
+%B.~L.~Combridge, J.~Kripfganz and J.~Ranft,
+%{\elevenit Phys. Lett.} {\elevenbf 70B} (1977) 234;
+%D.~W.~Duke and J.~F.~Owens,
+%{\elevenit Phys. Rev.} {\elevenbf D26} (1982) 1600.
+%
+\bibitem{HARDCROS}
+%\bibitem{DO82}
+D.~W.~Duke and J.~F.~Owens,
+{\elevenit Phys. Rev.} {\elevenbf D26} (1982) 1600;
+%
+%\bibitem{JW78}
+L.~M.~Jones and H.~W.~Wyld,
+{\elevenit Phys. Rev.} {\elevenbf D17} (1978) 759;
+%
+%\bibitem{CKR77}
+B.~L.~Combridge, J.~Kripfganz and J.~Ranft,
+{\elevenit Phys. Lett.} {\elevenbf 70B} (1977) 234;
+J.~F.~Owens, E.~Reya and M.~Gl\"{u}ck,
+{\elevenit Phys. Rev.} {\elevenbf D18} (1978) 1501;
+%
+%\bibitem{GOR78}
+B.~L.~Combridge,
+{\elevenit Nucl. Phys.} {\elevenbf B151} (1979) 429;
+M.~Gl\"{u}ck, J.~F.~Owens and E.~Reya,
+{\elevenit Phys. Rev.} {\elevenbf D17} (1978) 2324.
+
+
+
+
+%
+% "Probing the hadronic structure of the photon at TRISTAN"
+%\bibitem{TWOPHOTONBOOK}
+%H.~Kolanoski and P.~Zerwas, "High Energy Electron-Positron Physics",
+%eds. A.~Ali and P.~S\"{o}ding, World Scientific, pp. 695.
+%
+%\bibitem{TWOGAMEXP}
+%CELLO Collaboration, Z. Phys. C 51(1991)365;
+%TPC/Two-Gamma Collaboration, Phys. Rev. D41(1990)2667;
+%PLUTO Collaboration, Phys. Lett. B149(1984)421; Z. Phys. C 26(1984)191;
+%Z. Phys. C 33(1987)351.
+%
+%\bibitem{EIKONAL}
+%J.~R.~Forshaw and J.~K.~Storrow, Phys. Lett. B268(1991)116; Phys. Lett.
+%B278(1992)193.
+%
+%\bibitem{BKGREF}
+%M.~Drees and R.~M.~Godbole, DESY 92-044, March, 1992.
+%
+% "Differential luminosity under multiphoton beamstrahlung"
+%\bibitem{PSCHENA}
+%P.~Chen, SLAC-PUB-5615.
+
+%\bibitem{YOKOYAA}
+%K.~Yokoya, talk presented at Workshop on Physics and Experiments with
+%Linear Colliders, Saariselk\"{a}, Finland, Sept. 1991. 
+
+\end{thebibliography}
+
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%  Appendix
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+
+
+\section{The cross section formula for the sub-processes}
+
+For completeness, we summarize below the cross section formula 
+for the sub-processes used in the program\cite{HARDCROS}.
+In the formula below, $\hat{\theta}$ is a scattering angle in 
+the center-of-mass system and $\hat{s}$, $\hat{t}$ and $\hat{u}$ are
+mandelstarm variables.  The suffixes for $q$ indicate the quark
+flavour,
+$e_q$ is a quark charge, and $\hat{\beta}$ is a quark velocity: 
+$\hat{\beta}=\sqrt{1-4m^2_q/\hat{s}}$.
+The formula eq.\ref{EQA4} and \ref{EQA12} do not include
+the factors of 2 in the original paper as we integrate
+all polar angle range.  
+
+
+%We use the massive quark formula for the processes
+%which may involve charm quark, namely the processes (A-1), (A-3),
+%(A-7) and (A-10).  Otherwise, mass less quark formula 
+%were used. 
+%
+%$\alpha_S$ is calculated by a formula,
+%\begin{eqnarray}
+%\alpha_S(Q^2)={12\pi \over (33-2N_F)\log(Q^2/\Lambda^2) }
+%\end{eqnarray}.
+
+
+\subsection{$\gamma\gamma \rightarrow q_i\bar{q_i}$ }
+\begin{eqnarray}
+{d\sigma \over d\cos\hat{\theta}} &=&
+{3\pi\alpha^2 e_q^4 \hat{\beta} \over \hat{s} } \left[
+\frac{m^2_q -\hat{t}}{m^2_q-\hat{u}}  +
+ \frac{m^2_q -\hat{u}}{m^2_q-\hat{t}} +
+ 4 \left( \frac{m^2_q}{m^2_q-\hat{t}} + \frac{m^2_q}{m^2_q-\hat{u}}  
+  \right) \right. \nonumber \\
+&-& \left. 4  \left( \frac{m^2_q}{m^2_q-\hat{t}} +
+\frac{m^2_q}{m^2_q-\hat{u}}  
+  \right)^2 \right].
+\end{eqnarray}
+%\noindent where $\hat{\beta}=\sqrt{1-\frac{4m^2_q}{\hat{s}}}$.
+
+%\subsection{$\gamma q_i \rightarrow g q_i $}
+%\subsection{$\gamma q_i \rightarrow q_i g $ \cite{DO82}}
+\subsection{$\gamma q_i \rightarrow q_i g $ }
+\begin{equation}
+{d\sigma \over d\cos\hat{\theta}} = - { 4\pi\alpha e_q^2 \alpha_S \over 3\hat{s}}
+( \frac{\hat{t}}{\hat{s}} + \frac{\hat{s}}{\hat{t}} )
+\end{equation}
+
+%\subsection{$\gamma g \rightarrow q_i\bar{q_i}$\cite{JW78}}
+\subsection{$\gamma g \rightarrow q_i\bar{q_i}$}
+\begin{eqnarray}
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha e_q^2 \alpha_S\hat{\beta} \over 2\hat{s} } \left[
+\frac{m^2_q -\hat{t}}{m^2_q-\hat{u}}  +
+ \frac{m^2_q -\hat{u}}{m^2_q-\hat{t}} +
+ 4 \left( \frac{m^2_q}{m^2_q-\hat{t}} + \frac{m^2_q}{m^2_q-\hat{u}}  
+  \right) \right. \nonumber \\
+&-& \left. 4  \left( \frac{m^2_q}{m^2_q-\hat{t}} +
+\frac{m^2_q}{m^2_q-\hat{u}}  
+  \right)^2 \right].
+\end{eqnarray}
+% \noindent where $\hat{\beta}=\sqrt{1-\frac{4m^2_q}{\hat{s}}}$.
+
+%\subsection{$q_i + q_i \rightarrow q_i + q_i$\cite{CKR77}}
+\subsection{$q_i + q_i \rightarrow q_i + q_i$}
+\begin{eqnarray}
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2 \over 4\hat{s} } 
+\left[ \frac{4}{9} \left( 
+{\hat{s}^2 + \hat{u}^2 \over \hat{t}^2} + 
+{\hat{s}^2 + \hat{t}^2 \over \hat{u}^2} \right) 
+- \frac{8}{27}{\hat{s}^2 \over \hat{u}\hat{t}} \right] \label{EQA4} 
+\end{eqnarray}
+
+%\subsection{$q_i + q_j \rightarrow q_i + q_j$\cite{CKR77}}
+\subsection{$q_i + q_j \rightarrow q_i + q_j$}
+\begin{eqnarray}
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2 \over 2\hat{s} } 
+\left[ \frac{4}{9} {\hat{s}^2 + \hat{u}^2 \over \hat{t}^2} \right]
+\end{eqnarray}
+
+%\subsection{$q_i + \bar{q}_i \rightarrow q_i + \bar{q}_i$\cite{CKR77}}
+\subsection{$q_i + \bar{q}_i \rightarrow q_i + \bar{q}_i$}
+\begin{eqnarray}
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2 \over 2\hat{s} } 
+\left[ \frac{4}{9} \left( 
+{\hat{s}^2 + \hat{u}^2 \over \hat{t}^2} + 
+{\hat{t}^2 + \hat{u}^2 \over \hat{s}^2} \right) 
+- \frac{8}{27}{\hat{u}^2 \over \hat{s}\hat{t}} \right] 
+\end{eqnarray}
+
+
+%\subsection{$q_i + \bar{q}_i \rightarrow q_j + \bar{q}_j$\cite{GOR78}}
+\subsection{$q_i + \bar{q}_i \rightarrow q_j + \bar{q}_j$}
+\begin{eqnarray} 
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2\hat{\beta} \over 2\hat{s} } 
+\frac{4}{9} \left[ { (m^2_q -\hat{t})^2 + 
+(m^2_q-\hat{u})^2 + 2m^2_q\hat{s} \over \hat{s}^2 } \right]
+\end{eqnarray}
+% \noindent where $\hat{\beta}=\sqrt{1-\frac{4m^2_q}{\hat{s}}}$.
+
+%\subsection{$q_i + \bar{q}_j \rightarrow q_i + \bar{q}_j$\cite{CKR77}}
+\subsection{$q_i + \bar{q}_j \rightarrow q_i + \bar{q}_j$}
+\begin{eqnarray} 
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2 \over 2\hat{s} } 
+\frac{4}{9} \left[ {\hat{s}^2 + \hat{u}^2 \over \hat{t}^2 } \right]
+\end{eqnarray}
+
+%\subsection{$q_i + \bar{q}_i \rightarrow g + g$\cite{CKR77}}
+\subsection{$q_i + \bar{q}_i \rightarrow g + g$}
+\begin{eqnarray} 
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2 \over 2\hat{s} } 
+ \left[ \frac{32}{27}{\hat{u}^2 + \hat{t}^2 \over \hat{u}\hat{t} }
+- \frac{8}{3}{\hat{u}^2 + \hat{t}^2 \over \hat{s}^2 } \right]
+\end{eqnarray}
+
+%\subsection{$q_i + g \rightarrow q_i + g$\cite{CKR77}}
+\subsection{$q_i + g \rightarrow q_i + g$}
+\begin{eqnarray} 
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2 \over 2\hat{s} } 
+ \left[ -\frac{4}{9}{\hat{u}^2 + \hat{s}^2 \over \hat{u}\hat{s} }
++{\hat{u}^2 + \hat{s}^2 \over \hat{t}^2 } \right]
+\end{eqnarray}
+
+
+%\subsection{$g + g \rightarrow q_i + \bar{q}_i$\cite{GOR78}}
+\subsection{$g + g \rightarrow q_i + \bar{q}_i$}
+\begin{eqnarray} 
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2\hat{\beta} \over 32\hat{s} } 
+ \left[ 12 {(m_q^2-\hat{t})(m_q^2-\hat{u}) \over \hat{s}^2 }
++ \frac{8}{3} { (m_q^2-\hat{t})(m_q^2-\hat{u}) - 2m_q^2(m_q^2+\hat{t})
+   \over (m_q^2 - \hat{t})^2 }
+\right. \nonumber \\
+&+& \frac{8}{3} { (m_q^2-\hat{t})(m_q^2-\hat{u}) - 2m_q^2(m_q^2+\hat{u})
+   \over (m_q^2 - \hat{u})^2 }
+- \frac{2}{3}{m_q^2(\hat{s}-4m_q^2) 
+  \over (m_q^2-\hat{t})(m_q^2-\hat{u}) }
+\nonumber \\ 
+&-&  6 { (m_q^2-\hat{t})(m_q^2-\hat{u}) + m_q^2(\hat{u}-\hat{t})
+   \over \hat{s}(m_q^2-\hat{t}) }
+\nonumber \\
+&-& \left. 6 { (m_q^2-\hat{t})(m_q^2-\hat{u}) + m_q^2(\hat{t}-\hat{u})
+   \over \hat{s}(m_q^2-\hat{u}) } \right]
+\end{eqnarray}
+
+
+%\subsection{$g + g \rightarrow g + g $\cite{GOR78}}
+\subsection{$g + g \rightarrow g + g $}
+\begin{eqnarray} 
+{d\sigma \over d\cos\hat{\theta}} &=&
+{\pi\alpha_S^2 \over 4\hat{s} } 
+ \frac{9}{2}\left[ 3 - {\hat{u}\hat{t} \over \hat{s}^2 }
+- {\hat{u}\hat{s} \over \hat{t}^2 } 
+- {\hat{s}\hat{t} \over \hat{u}^2 } \right] \label{EQA12}
+\end{eqnarray}
+
+\section{Example of JCL on the FACOM machine at KEK}
+\label{JCLEXAMPLE}
+\begin{verbatim}
+//job-ID JOB CLASS=S
+//*
+//*  BASES step
+//*
+// EXEC FORT7CLG,
+//      PARM.FORT='OPT(3),NOS,NOSTATIS',
+//      PARM.LKED='NOMAP,LET'
+//FORT.SYSINC DD DSN=user-ID.MINIJET.FORT,DISP=SHR
+//FORT.SYSIN  DD DSN=user-ID.MINIJET.FORT(BSMAIN),DISP=SHR
+//LKED.SYSLIB DD
+//            DD DSN=user-ID.BASES50.LOAD,DISP=SHR
+//*
+//GO.SYSIN DD *
+     1,  1  Current loop count,   Max. Loop count
+    -4      Print Flag
+     0      Input Flag
+     5.     CPU time limit in minutes
+//******   BASES results.
+//GO.FT23F001 DD DISP=(NEW,PASS),
+// DSN=&&BASES,SPACE=(TRK,(10,10),RLSE)
+//*
+//*  Spring step.
+//*
+//  EXEC  FORT7CLG,
+//  PARM.FORT='OPT(3),NOS,AE,NOSTATIS',
+//  PARM.LKED='NOMAP'
+//FORT.SYSINC DD DSN=user-ID.MINIJET.FORT,DISP=SHR
+//FORT.SYSIN  DD DSN=user-ID.MINIJET.FORT(MNJSPR),DISP=SHR
+//LKED.SYSLIB DD
+//            DD DSN=user-ID.BASES50.LOAD,DISP=SHR
+//            DD DSN=user-ID.G#LUND63.LOAD,DISP=SHR
+//*
+//GO.FT05F001 DD *
+    10000000
+   20.0
+//*
+//******   BASES results to read
+//GO.FT23F001 DD DISP=(OLD,PASS),DSN=&&BASES
+//*
+\end{verbatim}
+
+\newpage
+\section{Test run results}
+
+Test run outputs for $p_t$ distribution of 
+direct (ID=13), once-resolved(ID=14) and twice-resolved(ID=15)
+processes at $\sqrt{s}=58$ GeV.
+
+\begin{small}
+\begin{verbatim}
+ Histogram (ID = 13 ) for Pt(for Direct)                                                  
+                              Linear Scale indicated by "*"
+     x      d(Sigma)/dx     0.0E+00      1.4E+00      2.8E+00     4.1E+00      
+ +-------+------------------+------------+------------+-----------+-----------+
+ I  E  0 I 0.000        E  0I                                                 I
+ I 3.000 I 4.273+-0.026 E  0I***************************************OOOOOOO   I
+ I 3.200 I 3.631+-0.020 E  0I**********************************OOOOOOOOOO     I
+ I 3.400 I 2.981+-0.015 E  0I****************************OOOOOOOOOOOOO        I
+ I 3.600 I 2.527+-0.013 E  0I***********************OOOOOOOOOOOOOOOO          I
+ I 3.800 I 2.175+-0.011 E  0I********************OOOOOOOOOOOOOOOOOO           I
+ I 4.000 I 1.826+-0.009 E  0I*****************OOOOOOOOOOOOOOOOOOO             I
+ I 4.200 I 1.573+-0.008 E  0I***************OOOOOOOOOOOOOOOOOOO               I
+ I 4.400 I 1.387+-0.007 E  0I*************OOOOOOOOOOOOOOOOOOO                 I
+ I 4.600 I 1.176+-0.006 E  0I***********OOOOOOOOOOOOOOOOOOO                   I
+ I 4.800 I 1.041+-0.006 E  0I**********OOOOOOOOOOOOOOOOOOO                    I
+ I 5.000 I 9.198+-0.052 E -1I*********OOOOOOOOOOOOOOOOOO                      I
+ I 5.200 I 7.994+-0.048 E -1I********OOOOOOOOOOOOOOOOOO                       I
+ I 5.400 I 7.149+-0.044 E -1I*******OOOOOOOOOOOOOOOOO                         I
+ I 5.600 I 6.342+-0.040 E -1I******OOOOOOOOOOOOOOOOO                          I
+ I 5.800 I 5.563+-0.037 E -1I******OOOOOOOOOOOOOOO                            I
+ I 6.000 I 5.049+-0.035 E -1I*****OOOOOOOOOOOOOOO                             I
+ I 6.200 I 4.498+-0.036 E -1I*****OOOOOOOOOOOOOO                              I
+ I 6.400 I 3.989+-0.031 E -1I****OOOOOOOOOOOOO                                I
+ I 6.600 I 3.666+-0.029 E -1I****OOOOOOOOOOOO                                 I
+ I 6.800 I 3.311+-0.027 E -1I****OOOOOOOOOOO                                  I
+ I 7.000 I 2.980+-0.026 E -1I***OOOOOOOOOOO                                   I
+ I 7.200 I 2.697+-0.023 E -1I***OOOOOOOOO                                     I
+ I 7.400 I 2.469+-0.023 E -1I***OOOOOOOO                                      I
+ I 7.600 I 2.210+-0.020 E -1I***OOOOOOO                                       I
+ I 7.800 I 2.058+-0.020 E -1I**OOOOOOO                                        I
+ I  E  0 I 0.000        E  0I                                                 I
+ +-------+------------------+---------------------------+---------------------+
+     x      d(Sigma)/dx     1.0E-01                     1.0E+00                
+                              Logarithmic Scale indicated by "O"
+\end{verbatim}
+\newpage
+\begin{verbatim}  
+ Histogram (ID = 14 ) for Pt(for 1 resolved)                                              
+                              Linear Scale indicated by "*"
+     x      d(Sigma)/dx     0.0E+00      1.0E+00      2.0E+00     3.0E+00      
+ +-------+------------------+------------+------------+-----------+-----------+
+ I  E  0 I 0.000        E  0I                                                 I
+ I 3.000 I 3.300+-0.036 E  0I******************************************OOOOO  I
+ I 3.200 I 2.444+-0.026 E  0I*******************************OOOOOOOOOOOOOO    I
+ I 3.400 I 1.935+-0.021 E  0I*************************OOOOOOOOOOOOOOOOOO      I
+ I 3.600 I 1.568+-0.016 E  0I********************OOOOOOOOOOOOOOOOOOOOO        I
+ I 3.800 I 1.216+-0.013 E  0I****************OOOOOOOOOOOOOOOOOOOOOOO          I
+ I 4.000 I 1.014+-0.011 E  0I*************OOOOOOOOOOOOOOOOOOOOOOOOO           I
+ I 4.200 I 8.342+-0.091 E -1I***********OOOOOOOOOOOOOOOOOOOOOOOOO             I
+ I 4.400 I 6.795+-0.078 E -1I*********OOOOOOOOOOOOOOOOOOOOOOOOO               I
+ I 4.600 I 5.609+-0.069 E -1I********OOOOOOOOOOOOOOOOOOOOOOOOO                I
+ I 4.800 I 4.621+-0.057 E -1I******OOOOOOOOOOOOOOOOOOOOOOOOO                  I
+ I 5.000 I 4.068+-0.051 E -1I******OOOOOOOOOOOOOOOOOOOOOOOO                   I
+ I 5.200 I 3.358+-0.045 E -1I*****OOOOOOOOOOOOOOOOOOOOOOOO                    I
+ I 5.400 I 2.776+-0.039 E -1I****OOOOOOOOOOOOOOOOOOOOOOO                      I
+ I 5.600 I 2.447+-0.036 E -1I****OOOOOOOOOOOOOOOOOOOOOO                       I
+ I 5.800 I 2.077+-0.030 E -1I***OOOOOOOOOOOOOOOOOOOOOO                        I
+ I 6.000 I 1.846+-0.030 E -1I***OOOOOOOOOOOOOOOOOOOOO                         I
+ I 6.200 I 1.540+-0.025 E -1I**OOOOOOOOOOOOOOOOOOOO                           I
+ I 6.400 I 1.368+-0.023 E -1I**OOOOOOOOOOOOOOOOOOOO                           I
+ I 6.600 I 1.149+-0.020 E -1I**OOOOOOOOOOOOOOOOOO                             I
+ I 6.800 I 1.042+-0.019 E -1I**OOOOOOOOOOOOOOOOO                              I
+ I 7.000 I 9.116+-0.184 E -2I**OOOOOOOOOOOOOOOO                               I
+ I 7.200 I 8.049+-0.158 E -2I**OOOOOOOOOOOOOOO                                I
+ I 7.400 I 7.143+-0.144 E -2I*OOOOOOOOOOOOOOO                                 I
+ I 7.600 I 6.556+-0.129 E -2I*OOOOOOOOOOOOOOO                                 I
+ I 7.800 I 5.782+-0.120 E -2I*OOOOOOOOOOOOOO                                  I
+ I  E  0 I 0.000        E  0I                                                 I
+ +-------+------------------+------------------+------------------+-----------+
+     x      d(Sigma)/dx     1.0E-02            1.0E-01            1.0E+00      
+                              Logarithmic Scale indicated by "O"
+\end{verbatim}
+\newpage
+\begin{verbatim}  
+ Histogram (ID = 15 ) for Pt(for two resolved)                                            
+                              Linear Scale indicated by "*"
+     x      d(Sigma)/dx     0.0E+00      1.1E+00      2.3E+00     3.4E+00      
+ +-------+------------------+------------+------------+-----------+-----------+
+ I  E  0 I 0.000        E  0I                                                 I
+ I 3.000 I 3.458+-0.053 E  0I***************************************OOOOOOOOO I
+ I 3.200 I 2.380+-0.037 E  0I***************************OOOOOOOOOOOOOOOOOO    I
+ I 3.400 I 1.728+-0.028 E  0I********************OOOOOOOOOOOOOOOOOOOOOO       I
+ I 3.600 I 1.250+-0.020 E  0I**************OOOOOOOOOOOOOOOOOOOOOOOOO          I
+ I 3.800 I 9.584+-0.170 E -1I***********OOOOOOOOOOOOOOOOOOOOOOOOOO            I
+ I 4.000 I 6.898+-0.122 E -1I********OOOOOOOOOOOOOOOOOOOOOOOOOOO              I
+ I 4.200 I 5.279+-0.095 E -1I******OOOOOOOOOOOOOOOOOOOOOOOOOO                 I
+ I 4.400 I 4.144+-0.078 E -1I*****OOOOOOOOOOOOOOOOOOOOOOOOO                   I
+ I 4.600 I 3.297+-0.066 E -1I****OOOOOOOOOOOOOOOOOOOOOOOOO                    I
+ I 4.800 I 2.529+-0.052 E -1I***OOOOOOOOOOOOOOOOOOOOOOO                       I
+ I 5.000 I 1.990+-0.040 E -1I***OOOOOOOOOOOOOOOOOOOOOO                        I
+ I 5.200 I 1.595+-0.034 E -1I**OOOOOOOOOOOOOOOOOOOOO                          I
+ I 5.400 I 1.245+-0.027 E -1I**OOOOOOOOOOOOOOOOOOO                            I
+ I 5.600 I 1.083+-0.031 E -1I**OOOOOOOOOOOOOOOOOO                             I
+ I 5.800 I 8.496+-0.213 E -2I*OOOOOOOOOOOOOOOOO                               I
+ I 6.000 I 7.033+-0.236 E -2I*OOOOOOOOOOOOOOO                                 I
+ I 6.200 I 5.995+-0.196 E -2I*OOOOOOOOOOOOOO                                  I
+ I 6.400 I 4.599+-0.144 E -2I*OOOOOOOOOOOO                                    I
+ I 6.600 I 4.343+-0.137 E -2I*OOOOOOOOOOO                                     I
+ I 6.800 I 3.593+-0.170 E -2I*OOOOOOOOOO                                      I
+ I 7.000 I 2.881+-0.091 E -2I*OOOOOOOO                                        I
+ I 7.200 I 2.612+-0.091 E -2I*OOOOOOO                                         I
+ I 7.400 I 2.037+-0.076 E -2I*OOOOO                                           I
+ I 7.600 I 1.806+-0.068 E -2I*OOOO                                            I
+ I 7.800 I 1.621+-0.067 E -2I*OOO                                             I
+ I  E  0 I 0.000        E  0I                                                 I
+ +-------+------------------+------------------+------------------+-----------+
+     x      d(Sigma)/dx     1.0E-02            1.0E-01            1.0E+00      
+                              Logarithmic Scale indicated by "O"
+\end{verbatim}
+\end{small}
+
+\newpage
+
+\begin{figure}[p]
+\vskip 15cm
+\caption{ \label{DIAGRAM}
+Diagrams contributing to the jet productions
+in two-photon processes in $e^+e^-$ reactions;
+(a) direct process, (b) once-resolved process,
+(c) twice-resolved process.}
+\end{figure}
+
+
+
+\end{document}
+
+

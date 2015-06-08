@@ -1,0 +1,79 @@
+#!/bin/bash
+
+helpmsg(){
+cat << eof
+  mnjrun [options]
+  -ndistr
+  -ptmin
+  -ncall
+  -ngbeam
+  -ngmins
+  -ngplus
+  -ebeam
+  -nqssrc
+  -ngntyp
+  -ngnprc
+  -nlam
+  -conf
+eof
+exit
+}
+
+setebeam(){
+  case $1 in 
+    21) EB=150 ;;
+    22) EB=250 ;;
+    23) EB=150 ;;
+    24) EB=250 ;;
+    25) EB=150 ;;
+    26) EB=250 ;;
+    27) EB=250 ;;
+    28) EB=500 ;;
+  esac  
+  echo $EB
+}
+
+today=`date`
+TEMPFILE=tmp_mnjbas.$$
+cat > $TEMPFILE <<EOF
+# Bases input file created by run_mnjbas at $today
+EOF
+while [ $# -ne 0 ]
+do
+ case "$1" in
+  -parm) shift ; cat $1 >> $TEMPFILE ;;
+  -ndistr) shift ; echo "MINIJET.NDISTR: $1" >> $TEMPFILE ;;
+  -ptmin)  shift ; echo "MINIJET.PTMIN: $1" >> $TEMPFILE;;
+  -ncall)  shift ; echo "MINIJET.NCALL: $1" >> $TEMPFILE;;
+  -ngbeam) shift ; echo "MINIJET.NGMINS: $1" >> $TEMPFILE ;
+                   echo "MINIJET.NGPLUS: $1" >> $TEMPFILE ;
+                   EB=`setebeam $1` ; 
+                   echo "MINIJET.EBEAM: $EB" >> $TEMPFILE ;;
+  -ngmins) shift ; echo "MINIJET.NGMINS: $1" >> $TEMPFILE ;;
+  -ngplus) shift ; echo "MINIJET.NGPLUS: $1" >> $TEMPFILE ;;
+  -ebeam)  shift ; echo "MINIJET.EBEAM: $1" >> $TEMPFILE ;; 
+  -nqssrc) shift ; echo "MINIJET.NQSSRC: $1" >> $TEMPFILE ;;
+  -ngntyp) shift ; echo "MINIJET.NGNTYP: $1" >> $TEMPFILE ;;
+  -ymax3)  shift ; echo "MINIJET.YMAX3: $1" >> $TEMPFILE ;;
+  -ymax4)  shift ; echo "MINIJET.YMAX4: $1" >> $TEMPFILE ;;
+  -nlam)   shift ; echo "MINIJET.NLAM: $1" >> $TEMPFILE ;;
+  -nlam) shift ; echo "MINIJET.NLAM: $1" >> $TEMPFILE ;;
+  -acc1) shift ; echo "MINIJET.ACC1: $1" >> $TEMPFILE ;;
+  -acc2) shift ; echo "MINIJET.ACC2: $1" >> $TEMPFILE ;;
+  -help) helpmsg ;;
+  -ncall) shift ; echo "MINIJET.NCALL: $1" >> $TEMPFILE ;;
+  -bsfile) shift ; echo "MINIJET.BASESDATAFILENAME: $1 " >> $TEMPFILE ;;
+  -conf) shift ; CONFFILE=$1 ;;
+  *) echo "Error :: Invalid option " $1 ; helpmsg ; exit ;;
+ esac
+ shift
+done
+
+if [ "x$CONFFILE" != "x" ] ; then
+  cp -p $TEMPFILE $CONFFILE
+fi
+
+./mnj_bases.exe < $TEMPFILE
+
+rm -f $TEMPFILE
+
